@@ -279,4 +279,63 @@ public class SimpleRelocatorTest {
                 fooRelocator.applyToSourceContent(asmRelocator.applyToSourceContent(
                         ioRelocator.applyToSourceContent(relocator.applyToSourceContent(sourceFile)))));
     }
+
+    @Test
+    public void testApplyToSourceContent() {
+        SimpleRelocator relocator1 = new SimpleRelocator(
+                "a.b.c",
+                "x.y.z.shade.a.b.c",
+                Collections.singletonList("x/y/z/onlyabc/**"),
+                null
+        );
+        SimpleRelocator relocator2 = new SimpleRelocator(
+                "d.e.f",
+                "x.y.z.shade.d.e.f",
+                Collections.singletonList(("x/y/z/onlydef/**")),
+                null
+        );
+        assertEquals(complexRelocatedFile, relocator2.applyToSourceContent(
+                relocator1.applyToSourceContent(complexSourceFile)
+        ));
+    }
+
+    private static final String complexSourceFile =
+            "package x.y.z.onlyabc;\n\n" +
+            "import a.b.c.Example;\n" +
+            "import a.b.c.d.Example;\n" +
+            "import d.e.f.Example;\n" +
+            "import d.e.f.g.Example;\n\n" +
+            "final class MyClass {}\n\n" +
+            "package x.y.z.onlydef;\n\n" +
+            "import a.b.c.Example;\n" +
+            "import a.b.c.d.Example;\n" +
+            "import d.e.f.Example;\n" +
+            "import d.e.f.g.Example;\n\n" +
+            "final class MyClass {}\n\n" +
+            "package x.y.z.nochanges;\n\n" +
+            "import a.b.c.Example;\n" +
+            "import a.b.c.d.Example;\n" +
+            "import d.e.f.Example;\n" +
+            "import d.e.f.g.Example;\n\n" +
+            "final class MyClass {}";
+
+    private static final String complexRelocatedFile =
+            "package x.y.z.onlyabc;\n\n" +
+            "import x.y.z.shade.a.b.c.Example;\n" +
+            "import x.y.z.shade.a.b.c.d.Example;\n" +
+            "import d.e.f.Example;\n" +
+            "import d.e.f.g.Example;\n\n" +
+            "final class MyClass {}\n\n" +
+            "package x.y.z.onlydef;\n\n" +
+            "import a.b.c.Example;\n" +
+            "import a.b.c.d.Example;\n" +
+            "import x.y.z.shade.d.e.f.Example;\n" +
+            "import x.y.z.shade.d.e.f.g.Example;\n\n" +
+            "final class MyClass {}\n\n" +
+            "package x.y.z.nochanges;\n\n" +
+            "import a.b.c.Example;\n" +
+            "import a.b.c.d.Example;\n" +
+            "import d.e.f.Example;\n" +
+            "import d.e.f.g.Example;\n\n" +
+            "final class MyClass {}";
 }
